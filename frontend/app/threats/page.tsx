@@ -1,144 +1,165 @@
 'use client'
 
 import Link from 'next/link'
-import { Shield, AlertTriangle, FileText, TrendingUp, ArrowRight } from 'lucide-react'
+import { Shield, AlertTriangle, ArrowLeft } from 'lucide-react'
 
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-dark">
-      {/* Navigation - White Theme */}
-      <nav className="bg-dark shadow-sm border-b border-gray-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-            </div>
-            <div className="flex items-center space-x-6">
-              <Link href="/security-assessment" className="nav-link">
-                Security Assessment
-              </Link>
-              <Link href="/threats" className="nav-link">
-                Threat Alerts
-              </Link>
-              <Link 
-                href="/security-assessment" 
-                className="btn btn-primary"
-              >
-                Get Started
-              </Link>
-            </div>
+export default function ThreatsPage() {
+  // Navigation Header Component - Updated with industry standard layout
+  const NavigationHeader = () => (
+    <nav className="bg-gray-800 shadow-xl border-b border-gray-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center space-x-6">
+            {/* Back to Home on the left */}
+            <Link href="/" className="nav-link flex items-center">
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back to Home
+            </Link>
+            {/* Threat Intelligence on the left */}
+            <span className="text-white font-semibold border-l border-gray-600 pl-6">
+              Threat Intelligence
+            </span>
+          </div>
+          <div className="flex items-center space-x-6">
+            <Link href="/security-assessment" className="nav-link">
+              Security Assessment
+            </Link>
           </div>
         </div>
-      </nav>
+      </div>
+    </nav>
+  )
 
-      {/* Hero Section - With Background Color */}
-      <section className="bg-gradient-to-br from-dark-light to-dark py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 font-bold">
-              Protect Your Nigerian Business from{" "} 
-              <span className="text-primary-500 font-bold">Digital Threats</span>
-            </h1>
-            <p className="text-xl text-gray-100 mb-8 font-medium max-w-3xl mx-auto">
-              NaijaBiz Shield helps Nigerian SMEs identify security risks, get personalized recommendations, 
-              and build resilience against cyber attacks tailored to our local context.
+  // Sample threat data
+  const currentThreats = [
+    {
+      id: 1,
+      title: 'WhatsApp Business Account Hijacking',
+      severity: 'High',
+      description: 'Attackers are targeting business WhatsApp accounts by pretending to be customers and sending verification codes. Once they gain access, they message your contacts for payments.',
+      recommendation: 'Never share your WhatsApp verification code with anyone. Enable two-step verification in WhatsApp settings.',
+      affected: ['Retail businesses', 'Service providers', 'Online sellers']
+    },
+    {
+      id: 2,
+      title: 'Fake Bank Alert Scams',
+      severity: 'High',
+      description: 'Scammers are using manipulated bank alert screenshots or SMS to convince businesses that payments have been made. Products are released before actual funds arrive.',
+      recommendation: 'Always verify transactions directly through your bank app or USSD code before releasing goods.',
+      affected: ['All businesses accepting transfers']
+    },
+    {
+      id: 3,
+      title: 'Vendor Impersonation Fraud',
+      severity: 'Medium',
+      description: 'Fraudsters are impersonating legitimate vendors and sending fake invoices with changed bank account details.',
+      recommendation: 'Always verify payment details directly with vendors using previously established contact methods.',
+      affected: ['Businesses with regular suppliers']
+    },
+    {
+      id: 4,
+      title: 'Phishing Email Attacks',
+      severity: 'Medium',
+      description: 'Targeted email campaigns pretending to be from banks, government agencies, or business partners requesting sensitive information.',
+      recommendation: 'Verify sender email addresses and never click suspicious links. Contact organizations directly through official channels.',
+      affected: ['All businesses with email communication']
+    }
+  ]
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity.toLowerCase()) {
+      case 'high':
+        return 'bg-red-500/20 text-red-400 border-red-500';
+      case 'medium':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500';
+      case 'low':
+        return 'bg-green-500/20 text-green-400 border-green-500';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500';
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900">
+      <NavigationHeader />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center mb-12">
+          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="h-8 w-8 text-red-400" />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Current Threat Intelligence
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Stay informed about the latest digital threats targeting Nigerian businesses. 
+            Updated regularly with actionable protection advice.
+          </p>
+        </div>
+
+        {/* Threat Alerts Grid */}
+        <div className="grid gap-6 max-w-6xl mx-auto">
+          {currentThreats.map((threat) => (
+            <div key={threat.id} className="card hover:shadow-lg transition-shadow duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4">
+                <h3 className="text-xl font-semibold text-white mb-2 sm:mb-0">
+                  {threat.title}
+                </h3>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getSeverityColor(threat.severity)}`}>
+                  {threat.severity} Risk
+                </span>
+              </div>
+              
+              <p className="text-gray-300 mb-4">
+                {threat.description}
+              </p>
+              
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-white mb-2">Protection Recommendation:</h4>
+                <p className="text-green-400 bg-green-500/10 p-3 rounded-lg">
+                  {threat.recommendation}
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-semibold text-white mb-2">Commonly Affected:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {threat.affected.map((item, index) => (
+                    <span 
+                      key={index}
+                      className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Additional Resources */}
+        <div className="max-w-6xl mx-auto mt-12">
+          <div className="card text-center">
+            <h3 className="text-2xl font-bold text-white mb-4">Need Immediate Help?</h3>
+            <p className="text-gray-300 mb-6">
+              If you suspect your business has been targeted by any of these threats, 
+              take immediate action to secure your accounts and contact your bank.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/security-assessment" 
-                className="btn btn-primary text-lg px-8 py-3 flex items-center justify-center"
+                className="btn btn-primary"
               >
-                Start Security Assessment
-                <ArrowRight className="ml-2 h-5 w-5" />
+                Run Security Assessment
               </Link>
-              <Link 
-                href="/threats" 
-                className="btn btn-secondary text-lg px-8 py-3"
-              >
-                View Current Threats
-              </Link>
+              <button className="btn btn-secondary">
+                Contact Support
+              </button>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Features Section - With Background Color */}
-      <section className="py-16 bg-dark-light">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
-              How NaijaBiz Shield Protects Your Business
-            </h2>
-            <p className="text-lg text-gray-200 max-w-2xl font-normal mx-auto">
-              Our platform is specifically designed for Nigerian SMEs facing unique digital challenges.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="card text-center hover:shadow-lg transition-shadow duration-200">
-              <div className="w-12 h-12 bg-[#d74622]/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <FileText className="h-6 w-6 text-[#d74622]" />
-              </div>
-              <h3 className="text-xl font-semibold text-white font-normal mb-2">Security Assessment</h3>
-              <p className="text-gray-100">
-                Complete a 10-minute assessment to identify your business's specific security vulnerabilities.
-              </p>
-            </div>
-
-            <div className="card text-center hover:shadow-lg transition-shadow duration-200">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="h-6 w-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-white font-normal mb-2">Threat Intelligence</h3>
-              <p className="text-gray-100">
-                Stay updated on the latest digital threats targeting Nigerian businesses.
-              </p>
-            </div>
-
-            <div className="card text-center hover:shadow-lg transition-shadow duration-200">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="h-6 w-6 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-white font-normal mb-2">Actionable Insights</h3>
-              <p className="text-gray-100">
-                Get personalized recommendations and step-by-step guidance to improve your security.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section - With Your Gradient */}
-      <section className="py-16 bg-gradient-to-r from-[#dd020f] via-[#76127f] to-[#0c22f1] text-white font-normal">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to Secure Your Business?
-          </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Join hundreds of Nigerian SMEs who have already protected their businesses with our free assessment.
-          </p>
-          <Link 
-            href="/security-assessment" 
-            className="btn bg-dark text-white font-normal hover:bg-gray-700 text-lg px-8 py-3 inline-block"
-          >
-            Start Free Assessment
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white font-normal py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-4 md:mb-0">
-              <Shield className="h-6 w-6 text-[#d74622]" />
-              <span className="ml-2 text-lg font-semibold">NaijaBiz Shield</span>
-            </div>
-            <div className="text-gray-100">
-              &copy; 2024 InspireNova Enterprises. Built for Nigerian SMEs.
-            </div>
-          </div>
-        </div>
-      </footer>
+      </div>
     </div>
   )
 }
