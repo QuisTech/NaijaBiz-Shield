@@ -110,18 +110,19 @@ export default function SecurityAssessmentPage() {
     setError('');
   };
 
-  // Navigation Header Component
+  // Navigation Header Component - Updated with industry standard layout
   const NavigationHeader = () => (
     <nav className="bg-gray-800 shadow-xl border-b border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex items-center">
-          </div>
           <div className="flex items-center space-x-6">
+            {/* Back to Home on the left */}
             <Link href="/" className="nav-link flex items-center">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Home
             </Link>
+          </div>
+          <div className="flex items-center space-x-6">
             <Link href="/threats" className="nav-link">
               Threat Alerts
             </Link>
