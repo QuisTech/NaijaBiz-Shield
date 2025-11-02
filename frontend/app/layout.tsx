@@ -30,7 +30,7 @@ export default function RootLayout({
                   <div className="text-sm opacity-90">Digital Armor for Nigerian SMEs</div>
                 </div>
               </Link>
-              
+
               {/* Navigation - WITH PROPER LINKS */}
               <nav>
                 <ul className="flex flex-wrap justify-center gap-6">
@@ -40,12 +40,12 @@ export default function RootLayout({
                   <li><Link href="/#contact" className="text-white hover:text-gray-200 font-medium transition-colors">Contact</Link></li>
                 </ul>
               </nav>
-              
+
               {/* Auth Buttons - WITH PROPER LINKS */}
               <div className="flex gap-2">
-                <button className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-primary-500 transition-colors">
+                <Link href="/security-assessment" className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-primary-500 transition-colors">
                   Login
-                </button>
+                </Link>
                 <Link href="/security-assessment" className="px-4 py-2 bg-white text-primary-500 rounded hover:bg-gray-100 transition-colors font-semibold">
                   Sign Up
                 </Link>
