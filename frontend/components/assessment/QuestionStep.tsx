@@ -1,7 +1,8 @@
+
 'use client';
 
 import { AssessmentSection, AssessmentQuestion } from '@/types/assessment';
-import { ArrowLeft, ArrowRight, Shield } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 
 interface QuestionStepProps {
   section: AssessmentSection;
@@ -33,108 +34,96 @@ export const QuestionStep: React.FC<QuestionStepProps> = ({
   };
 
   const handleNext = () => {
-    if (answer && !loading) {
+    if (answer) {
       onNext();
     }
   };
-
-  const canProceed = answer && !loading;
 
   return (
     <div className="card">
       {/* Section Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-2 text-sm text-[#d74622] font-medium mb-2">
+        <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
           <Shield className="h-4 w-4" />
           <span>{section.title}</span>
         </div>
-        <div className="text-xs text-gray-400">
-          Question {currentStep + 1} of {totalSteps}
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-white">
+            Question {currentStep + 1} of {totalSteps}
+          </h2>
+          <span className="text-sm text-gray-400 bg-gray-700 px-3 py-1 rounded-full">
+            {Math.round(((currentStep + 1) / totalSteps) * 100)}% Complete
+          </span>
         </div>
       </div>
 
       {/* Question */}
-      <h3 className="text-xl font-semibold text-white mb-8">
-        {question.question}
-      </h3>
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-white mb-6">
+          {question.question}
+        </h3>
 
-      {/* Options */}
-      <div className="space-y-3 mb-8">
-        {question.type === 'radio' && question.options?.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => handleOptionSelect(option.value)}
-            className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-              answer === option.value
-                ? 'border-[#d74622] bg-[#d74622]/5 text-[#d74622]'
-                : 'border-gray-600 hover:border-gray-500 hover:bg-gray-700'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="font-medium">{option.label}</span>
-              {answer === option.value && (
-                <div className="w-6 h-6 bg-[#d74622] rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2  rounded-full"></div>
+        {/* Options */}
+        <div className="space-y-3">
+          {question.options?.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleOptionSelect(option.value)}
+              className={`w-full text-left p-4 rounded-lg border transition-all ${
+                answer === option.value
+                  ? 'border-[#d74622] bg-[#d74622]/10 text-white'
+                  : 'border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-700/50'
+              }`}
+            >
+              <div className="flex items-center">
+                <div className={`w-5 h-5 rounded-full border mr-3 flex items-center justify-center ${
+                  answer === option.value
+                    ? 'border-[#d74622] bg-[#d74622]'
+                    : 'border-gray-500'
+                }`}>
+                  {answer === option.value && (
+                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                  )}
                 </div>
-              )}
-            </div>
-          </button>
-        ))}
-
-        {question.type === 'select' && question.options?.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => handleOptionSelect(option.value)}
-            className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-              answer === option.value
-                ? 'border-[#d74622] bg-[#d74622]/5 text-[#d74622]'
-                : 'border-gray-600 hover:border-gray-500 hover:bg-gray-700'
-            }`}
-          >
-            <span className="font-medium">{option.label}</span>
-          </button>
-        ))}
-
-        {question.type === 'text' && (
-          <textarea
-            value={answer}
-            onChange={(e) => handleOptionSelect(e.target.value)}
-            placeholder="Type your answer here..."
-            className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-[#d74622] focus:border-transparent resize-none"
-            rows={4}
-          />
-        )}
+                <span className="font-medium">{option.label}</span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between items-center pt-6 border-t border-gray-600">
+      <div className="flex justify-between pt-6 border-t border-gray-700">
         <button
           onClick={onBack}
-          className="btn-secondary flex items-center"
+          className="btn btn-secondary flex items-center"
           disabled={loading}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ChevronLeft className="h-4 w-4 mr-1" />
           Back
         </button>
-
+        
         <button
           onClick={handleNext}
-          disabled={!canProceed}
-          className="btn-primary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!answer || loading}
+          className="btn btn-primary flex items-center"
         >
-          {loading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Processing...
-            </>
-          ) : (
-            <>
-              {isLast ? 'Get Results' : 'Next Question'}
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </>
-          )}
+          {isLast ? 'Complete Assessment' : 'Next Question'}
+          <ChevronRight className="h-4 w-4 ml-1" />
         </button>
       </div>
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-gray-900/80 rounded-xl flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#d74622] mx-auto mb-2"></div>
+            <div className="text-white text-sm">Processing...</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+

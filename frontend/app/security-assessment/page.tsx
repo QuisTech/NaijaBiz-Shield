@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -108,15 +109,15 @@ export default function SecurityAssessmentPage() {
     setResult(null);
     setLoading(false);
     setError('');
+    fetchQuestions(); // Reload questions for fresh start
   };
 
-  // Navigation Header Component - Updated with industry standard layout
+  // Navigation Header Component
   const NavigationHeader = () => (
     <nav className="bg-gray-800 shadow-xl border-b border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-6">
-            {/* Back to Home on the left */}
             <Link href="/" className="nav-link flex items-center">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to Home
@@ -141,7 +142,7 @@ export default function SecurityAssessmentPage() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#d74622] mx-auto mb-4"></div>
             <div className="text-white text-lg">Loading assessment questions...</div>
-            <div className="text-gray-400 text-sm mt-2">Connecting to security service</div>
+            <div className="text-gray-400 text-sm mt-2">Preparing your security assessment</div>
           </div>
         </div>
       </div>
@@ -224,3 +225,5 @@ export default function SecurityAssessmentPage() {
     </div>
   );
 }
+
+
