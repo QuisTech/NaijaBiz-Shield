@@ -10,10 +10,10 @@ class EmailService:
             MAIL_USERNAME=os.getenv("SMTP_USERNAME", ""),
             MAIL_PASSWORD=os.getenv("SMTP_PASSWORD", ""),
             MAIL_FROM=os.getenv("SMTP_FROM", "security@naijabizshield.com"),
-            MAIL_PORT=int(os.getenv("SMTP_PORT", 587)),
+            MAIL_PORT=int(os.getenv("SMTP_PORT", 465)),
             MAIL_SERVER=os.getenv("SMTP_SERVER", "smtp.gmail.com"),
-            MAIL_STARTTLS=True,
-            MAIL_SSL_TLS=False,
+            MAIL_STARTTLS=False,
+            MAIL_SSL_TLS=True,
             USE_CREDENTIALS=True,
             VALIDATE_CERTS=True
         )
