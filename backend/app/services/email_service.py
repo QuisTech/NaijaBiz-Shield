@@ -7,11 +7,11 @@ from typing import List, Optional
 class EmailService:
     def __init__(self):
         self.conf = ConnectionConfig(
-            MAIL_USERNAME=os.getenv("SMTP_USERNAME", ""),
+            MAIL_USERNAME=os.getenv("SMTP_USERNAME", "resend"),
             MAIL_PASSWORD=os.getenv("SMTP_PASSWORD", ""),
-            MAIL_FROM=os.getenv("SMTP_FROM", "security@naijabizshield.com"),
+            MAIL_FROM=os.getenv("SMTP_FROM", "security@resend.dev"),
             MAIL_PORT=int(os.getenv("SMTP_PORT", 465)),
-            MAIL_SERVER=os.getenv("SMTP_SERVER", "smtp.gmail.com"),
+            MAIL_SERVER=os.getenv("SMTP_SERVER", "smtp.resend.com"),
             MAIL_STARTTLS=False,
             MAIL_SSL_TLS=True,
             USE_CREDENTIALS=True,
