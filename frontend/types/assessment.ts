@@ -32,11 +32,12 @@ export interface SecurityRecommendation {
 
 export interface AssessmentResult {
   assessment_id: number;
-  risk_score: number; // At root level
-  risk_level: 'low' | 'medium' | 'high' | 'critical'; // At root level
+  risk_score: number;
+  risk_level: 'low' | 'medium' | 'high' | 'critical';
   recommendations: SecurityRecommendation[];
   threat_alerts: any[];
-  risk_assessment?: RiskAssessment; // ✅ Added optional
+  risk_assessment?: RiskAssessment;
+  email_sent: boolean; // NEW: Added email_sent property
 }
 
 export interface AssessmentData {
@@ -46,7 +47,7 @@ export interface AssessmentData {
 export interface SecurityAssessment {
   id: number;
   business_name: string;
-  business_email?: string; // NEW: Optional email field
+  business_email?: string;
   business_type: string;
   employee_count: string;
   risk_score: number;

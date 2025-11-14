@@ -16,7 +16,21 @@ export const AssessmentResults: React.FC<AssessmentResultsProps> = ({
   onRestart,
   downloadLoading
 }) => {
-  const { risk_assessment, recommendations, threat_alerts, assessment_id } = result;
+  const { 
+    recommendations, 
+    threat_alerts, 
+    assessment_id, 
+    email_sent,
+    risk_score,
+    risk_level 
+  } = result;
+
+  // Use nested risk_assessment if available, otherwise use root level properties
+  const riskData = result.risk_assessment || {
+    risk_score: risk_score,
+    risk_level: risk_level,
+    total_questions_answered: 0
+  };
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -44,34 +58,41 @@ export const AssessmentResults: React.FC<AssessmentResultsProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
+      {/* Email Success Notification */}
+      {email_sent && (
+        <div className="mb-6 p-4 bg-green-500/10 border border-green-500 rounded-lg">
+          <div className="flex items-center">
+            <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+            <span className="text-green-400">
+              Your report is being sent to your email. Please check your inbox.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Risk Summary */}
-<div className="card text-center">
-  <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center bg-gradient-to-br from-[#dd020f] via-[#76127f] to-[#0c22f1]">
-    <Shield className="h-10 w-10 text-white" />
-  </div>
-  
-  <h2 className="text-3xl font-bold text-white mb-4">
-    Security Assessment Complete
-  </h2>
+      <div className="card text-center">
+        <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center bg-gradient-to-br from-[#dd020f] via-[#76127f] to-[#0c22f1]">
+          <Shield className="h-10 w-10 text-white" />
+        </div>
+        
+        <h2 className="text-3xl font-bold text-white mb-4">
+          Security Assessment Complete
+        </h2>
 
-  {risk_assessment && (
-    <>
-      <div className="inline-block">
-        <span className={`risk-badge ${getRiskColor(risk_assessment.risk_level)} text-lg px-6 py-2`}>
-          {risk_assessment.risk_level.toUpperCase()} RISK
-        </span>
+        <div className="inline-block">
+          <span className={`risk-badge ${getRiskColor(riskData.risk_level)} text-lg px-6 py-2`}>
+            {riskData.risk_level.toUpperCase()} RISK
+          </span>
+        </div>
+
+        <p className="text-gray-300 mt-4">
+          Your business security score: <strong>{riskData.risk_score.toFixed(1)}%</strong>
+        </p>
+        <p className="text-sm text-gray-500">
+          {riskData.total_questions_answered} questions analyzed
+        </p>
       </div>
-
-      <p className="text-gray-300 mt-4">
-        Your business security score: <strong>{risk_assessment.risk_score.toFixed(1)}%</strong>
-      </p>
-      <p className="text-sm text-gray-500">
-        {risk_assessment.total_questions_answered} questions analyzed
-      </p>
-    </>
-  )}
-</div>
-
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Recommendations */}

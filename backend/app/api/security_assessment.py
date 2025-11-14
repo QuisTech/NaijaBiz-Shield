@@ -10,6 +10,7 @@ from pathlib import Path
 
 from app.services.assessment_service import SecurityAssessmentService
 from app.services.pdf_service import PDFReportService
+from app.services.email_service import email_service  # NEW: Import email service
 from app.models.assessment import SecurityAssessment
 from app.core.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +18,70 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter()
 assessment_service = SecurityAssessmentService()
 pdf_service = PDFReportService()
+
+# Add this new function for background email sending
+async def send_report_email(assessment_id: int, business_email: str, business_name: str, db: AsyncSession):
+    """Background task to generate and send report via email"""
+    try:
+        # Get assessment data
+        result = await db.execute(
+            select(SecurityAssessment).where(SecurityAssessment.id == assessment_id)
+        )
+        assessment = result.scalar_one_or_none()
+        
+        if not assessment:
+            print(f"Assessment {assessment_id} not found for email")
+            return
+
+        # Create reports directory if it doesn't exist
+        reports_dir = Path("reports")
+        reports_dir.mkdir(exist_ok=True)
+        
+        # Generate PDF
+        output_path = reports_dir / f"security_report_{assessment_id}.pdf"
+        
+        assessment_data = {
+            'business_name': assessment.business_name,
+            'business_type': assessment.business_type,
+            'employee_count': assessment.employee_count,
+            'risk_score': assessment.risk_score,
+            'risk_level': assessment.risk_level,
+            'total_questions_answered': len(assessment.assessment_data) if assessment.assessment_data else 0
+        }
+        
+        # Generate the PDF
+        final_path = pdf_service.create_security_report(
+            assessment_data,
+            assessment.recommendations or [],
+            str(output_path)
+        )
+        
+        # Send welcome email immediately
+        await email_service.send_welcome_email(business_email, business_name)
+        
+        # Send report email with attachment
+        if final_path and os.path.exists(final_path):
+            email_sent = await email_service.send_security_report(
+                business_email, 
+                business_name, 
+                final_path, 
+                assessment_id
+            )
+            
+            if email_sent:
+                print(f"Report email sent successfully to {business_email}")
+            else:
+                print(f"Failed to send report email to {business_email}")
+        
+        # Clean up PDF file after sending
+        try:
+            if os.path.exists(final_path):
+                os.remove(final_path)
+        except Exception as e:
+            print(f"Error cleaning up PDF: {str(e)}")
+            
+    except Exception as e:
+        print(f"Error in background email task: {str(e)}")
 
 @router.get("/questions")
 async def get_assessment_questions():
@@ -45,7 +110,11 @@ async def get_current_threats():
         raise HTTPException(status_code=500, detail=f"Error loading threats: {str(e)}")
 
 @router.post("/assess")
-async def submit_assessment(assessment_data: Dict[str, Any], db: AsyncSession = Depends(get_db)):
+async def submit_assessment(
+    assessment_data: Dict[str, Any], 
+    background_tasks: BackgroundTasks,  # NEW: Add background tasks
+    db: AsyncSession = Depends(get_db)
+):
     """Submit security assessment and get results"""
     try:
         # Calculate risk score
@@ -60,7 +129,7 @@ async def submit_assessment(assessment_data: Dict[str, Any], db: AsyncSession = 
         # Save to database (with email)
         db_assessment = SecurityAssessment(
             business_name=assessment_data.get('business_name'),
-            business_email=assessment_data.get('business_email'),  # NEW: Save email
+            business_email=assessment_data.get('business_email'),
             business_type=assessment_data.get('answers', {}).get('business_type'),
             employee_count=assessment_data.get('answers', {}).get('employee_count'),
             risk_score=risk_result['risk_score'],
@@ -73,15 +142,29 @@ async def submit_assessment(assessment_data: Dict[str, Any], db: AsyncSession = 
         await db.commit()
         await db.refresh(db_assessment)
         
+        # NEW: Start background task to send email
+        business_email = assessment_data.get('business_email')
+        business_name = assessment_data.get('business_name')
+        
+        if business_email and business_name:
+            background_tasks.add_task(
+                send_report_email, 
+                db_assessment.id, 
+                business_email, 
+                business_name,
+                db
+            )
+        
         return {
             "success": True,
             "data": {
                 "assessment_id": db_assessment.id,
                 "risk_assessment": risk_result,
                 "recommendations": recommendations,
-                "threat_alerts": assessment_service.get_current_threats()
+                "threat_alerts": assessment_service.get_current_threats(),
+                "email_sent": bool(business_email)  # NEW: Indicate email will be sent
             },
-            "message": "Assessment completed successfully"
+            "message": "Assessment completed successfully. Report will be sent to your email."  # Updated message
         }
         
     except Exception as e:
