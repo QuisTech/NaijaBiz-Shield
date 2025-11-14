@@ -56,3 +56,13 @@ export interface SecurityAssessment {
   recommendations: SecurityRecommendation[];
   created_at: string;
 }
+
+export interface AssessmentResult {
+  assessment_id: number;
+  risk_score: number;
+  risk_level: 'low' | 'medium' | 'high' | 'critical';
+  email_sent: boolean; // ← ADD THIS
+  recommendations: SecurityRecommendation[];
+  threat_alerts: any[];
+  risk_assessment?: RiskAssessment;
+}

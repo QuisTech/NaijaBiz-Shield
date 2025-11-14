@@ -71,6 +71,7 @@ const mockResult: AssessmentResult = {
   assessment_id: Math.floor(Math.random() * 1000),
   risk_score: 65,
   risk_level: 'medium',
+  email_sent: false, // ← ADDED THIS LINE
   recommendations: [
     {
       id: 1,
@@ -110,7 +111,11 @@ const realApi = {
     const response = await fetch(`${API_BASE_URL}/api/v1/security/assess`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ business_name: businessName, answers }),
+      body: JSON.stringify({ 
+        business_name: businessName, 
+        answers,
+        business_email: 'user@example.com' // This would come from your form
+      }),
     });
     if (!response.ok) throw new Error('Failed to submit assessment');
     const data = await response.json();
@@ -134,11 +139,16 @@ const mockApi = {
   async submitAssessment(businessName: string, answers: AssessmentAnswers): Promise<AssessmentResult> {
     await new Promise(resolve => setTimeout(resolve, 1200));
     console.log('Business:', businessName, 'Answers:', answers);
+    
+    // Simulate email being sent if business name contains "email" or is longer than 3 characters
+    const shouldSendEmail = businessName.toLowerCase().includes('email') || businessName.length > 3;
+    
     return {
       ...mockResult,
       assessment_id: Math.floor(Math.random() * 1000),
       risk_score: Math.floor(Math.random() * 40) + 30,
-      risk_level: 'medium'
+      risk_level: 'medium',
+      email_sent: shouldSendEmail // ← ADDED: Simulate email sending based on business name
     };
   },
 
